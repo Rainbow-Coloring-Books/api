@@ -1,0 +1,115 @@
+openapi: 3.0.0
+info:
+  title: Custom Coloring Book API - Generate
+  version: 1.1.0
+
+paths:
+  /preview:
+    get:
+      summary: Preview the assembled coloring book
+      parameters:
+        - name: book_id
+          in: query
+          description: ID of the book to be previewed
+          required: true
+          schema:
+            type: string
+            description: The ID of the assembled coloring book
+            example: 12345
+      responses:
+        '200':
+          description: Book preview generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  preview_url:
+                    type: string
+                    format: uri
+                    description: The URL of the preview image of the coloring book
+                    example: https://example.com/previews/12345.png
+                example:
+                  preview_url: https://example.com/previews/12345.png
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: An error message
+                example:
+                  message: Invalid input, please provide a valid book ID
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: An error message
+                example:
+                  message: Internal server error, please try again later
+
+  /export:
+    post:
+      summary: Export the assembled coloring book as a PDF
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                book_id:
+                  type: string
+                  description: The ID of the assembled coloring book to export
+                  example: 12345
+              required:
+                - book_id
+            example:
+              book_id: 12345
+      responses:
+        '200':
+          description: Book exported successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pdf_url:
+                    type: string
+                    format: uri
+                    description: The URL of the exported PDF of the coloring book
+                    example: https://example.com/exports/12345.pdf
+                example:
+                  pdf_url: https://example.com/exports/12345.pdf
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: An error message
+                example:
+                  message: Invalid input, please provide a valid book ID
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: An error message
+                example:
+                  message: Internal server error, please try again later

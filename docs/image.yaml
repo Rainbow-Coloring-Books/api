@@ -1,0 +1,84 @@
+openapi: 3.0.0
+info:
+  title: Custom Coloring Book API - Image
+  version: 1.1.0
+
+paths:
+  /image:
+    post:
+      summary: Generate and customize image
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                theme:
+                  type: string
+                  enum: [animals, nature, vehicles, buildings, abstract]
+                  description: The theme of the image
+                  example: animals
+                description:
+                  type: string
+                  maxLength: 100
+                  description: A description of the image
+                  example: A cute kitten playing with a ball of yarn
+              required:
+                - theme
+                - description
+            example:
+              theme: animals
+              description: A cute kitten playing with a ball of yarn
+      responses:
+        '200':
+          description: Images generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  images:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        url:
+                          type: string
+                          format: uri
+                          description: The URL of the generated image
+                          example: https://example.com/images/12345.png
+                        image_id:
+                          type: string
+                          description: The ID of the generated image
+                          example: 12345
+                example:
+                  images:
+                    - url: https://example.com/images/12345.png
+                      image_id: 12345
+                    - url: https://example.com/images/67890.png
+                      image_id: 67890
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: An error message
+                example:
+                  message: Invalid input, please provide a valid theme and description
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: An error message
+                example:
+                  message: Internal server error, please try again later

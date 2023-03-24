@@ -1,0 +1,76 @@
+openapi: 3.0.0
+info:
+  title: Custom Coloring Book API - Cover
+  version: 1.1.0
+
+paths:
+  /book-cover:
+    post:
+      summary: Customize book cover
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  maxLength: 100
+                  description: The title of the book
+                  example: My Amazing Coloring Book
+                color_scheme:
+                  type: string
+                  enum: [light, dark, colorful, monochrome]
+                  description: The color scheme of the book cover
+                  example: colorful
+                background_image_id:
+                  type: string
+                  description: The ID of the background image to use for the book cover
+                  example: 12345
+              required:
+                - title
+                - color_scheme
+                - background_image_id
+            example:
+              title: My Amazing Coloring Book
+              color_scheme: colorful
+              background_image_id: 12345
+      responses:
+        '200':
+          description: Book cover customized successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cover_id:
+                    type: string
+                    description: The ID of the customized book cover
+                    example: 67890
+                example:
+                  cover_id: 67890
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: An error message
+                example:
+                  message: Invalid input, please provide a valid title, color scheme, and background image ID
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: An error message
+                example:
+                  message: Internal server error, please try again later

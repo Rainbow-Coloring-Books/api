@@ -1,0 +1,199 @@
+openapi: 3.0.0
+info:
+  title: Custom Coloring Book API - User
+  version: 1.1.0
+
+servers:
+  - url: https://www.googleapis.com
+
+paths:
+  /register:
+    post:
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: The user's email address
+                password:
+                  type: string
+                  minLength: 8
+                  description: The user's password
+              required:
+                - email
+                - password
+            example:
+              email: john.doe@example.com
+              password: veryStrongPassword123
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: A success message
+                  user_id:
+                    type: integer
+                    description: The ID of the newly created user
+                example:
+                  message: User created successfully
+                  user_id: 123
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: An error message
+                example:
+                  message: Invalid input, please provide valid email and password
+
+  /login:
+    post:
+      summary: Log in a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: The user's email address
+                password:
+                  type: string
+                  minLength: 8
+                  description: The user's password
+              required:
+                - email
+                - password
+            example:
+              email: john.doe@example.com
+              password: veryStrongPassword123
+      responses:
+        '200':
+          description: User logged in successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: An authentication token for the user
+                  user_id:
+                    type: integer
+                    description: The ID of the logged in user
+                example:
+                  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  user_id: 123
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: An error message
+                example:
+                  message: Unauthorized, please provide valid credentials
+
+  /oauth2/v4/token:
+    post:
+      summary: Get an access token from a Google Sign-In authorization code
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: The authorization code obtained from the Google Sign-In flow
+                client_id:
+                  type: string
+                  description: The client ID of your Google Cloud Console project
+                client_secret:
+                  type: string
+                  description: The client secret of your Google Cloud Console project
+                redirect_uri:
+                  type: string
+                  description: The redirect URI registered for your Google Cloud Console project
+                grant_type:
+                  type: string
+                  description: The OAuth 2.0 grant type. Must be set to authorization_code for the Google Sign-In flow.
+              required:
+                - code
+                - client_id
+                - client_secret
+                - redirect_uri
+                - grant_type
+            example:
+              code: 4/v6xr77ewYqjksZLdUHi...
+              client_id: your_client_id.apps.googleusercontent.com
+              client_secret: your_client_secret
+              redirect_uri: https://yourapp.com/oauth2callback
+              grant_type: authorization_code
+      responses:
+        '200':
+          description: Access token obtained successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    description: The access token that can be used to make authorized API calls
+                  expires_in:
+                    type: integer
+                    description: The duration of the access token in seconds
+                  token_type:
+                    type: string
+                    description: The type of the access token, usually "Bearer"
+                  refresh_token:
+                    type: string
+                    description: A refresh token that can be used to obtain a new access token when the current one expires
+                  scope:
+                    type: string
+                    description: The scopes of access granted by the access token
+                example:
+                  access_token: ya29.a0Adw1xeWYf33JS...
+                  expires_in: 3600
+                  token_type: Bearer
+                  refresh_token: 1//0c6UYPw6gJLE4CgYIARAAGA...
+                  scope: https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email
+        '400':
+          description: Invalid input or error during token exchange
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: The error code
+                  error_description:
+                    type: string
+                    description: A human-readable description of the error
+                example:
+                  error: invalid_grant
+                  error_description: Invalid authorization code

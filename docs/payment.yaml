@@ -1,0 +1,84 @@
+openapi: 3.0.0
+info:
+  title: Custom Coloring Book API - Payment
+  version: 1.1.0
+
+paths:
+  /payment:
+    post:
+      summary: Process payment for a coloring book order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                stripe_token:
+                  type: string
+                  description: The Stripe token for the payment
+                  example: "tok_1I4Mq8Jt4i4v4P4oXK22pS8C"
+                book_id:
+                  type: string
+                  description: The ID of the book being ordered
+                  example: "12345"
+                amount:
+                  type: number
+                  format: float
+                  description: The amount of the payment in USD
+                  example: 12.99
+                currency:
+                  type: string
+                  description: The currency of the payment (default: USD)
+                  example: "usd"
+                  default: 'usd'
+              required:
+                - stripe_token
+                - book_id
+                - amount
+            example:
+              stripe_token: "tok_1I4Mq8Jt4i4v4P4oXK22pS8C"
+              book_id: "12345"
+              amount: 12.99
+              currency: "usd"
+      responses:
+        '200':
+          description: Payment processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: A success message
+                  charge_id:
+                    type: string
+                    description: The ID of the Stripe charge
+                example:
+                  message: Payment processed successfully
+                  charge_id: "ch_1I4Mq8Jt4i4v4P4oe9XmTfgi"
+        '400':
+          description: Invalid input or payment processing error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: An error message
+                example:
+                  message: Invalid input or payment processing error, please try again later
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: An error message
+                example:
+                  message: Internal server error, please try again later
