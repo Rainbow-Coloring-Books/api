@@ -8,15 +8,14 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 
-	// TODO add actual paths
-	"your_project_name/internal/service"
+	userService "rainbowcoloringbooks/internal/service/user"
 )
 
 type UserHandler struct {
-	userService service.UserService
+	userService userService.UserService
 }
 
-func NewUserHandler(userService service.UserService) *UserHandler {
+func NewUserHandler(userService userService.UserService) *UserHandler {
 	return &UserHandler{userService: userService}
 }
 
