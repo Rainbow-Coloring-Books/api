@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
+	"rainbowcoloringbooks/internal"
 	"rainbowcoloringbooks/internal/db"
 	userHandler "rainbowcoloringbooks/internal/handler/user"
 	userRepo "rainbowcoloringbooks/internal/repository/user"
@@ -23,7 +25,12 @@ type User struct {
 var validate *validator.Validate
 
 func main() {
-	db, err := db.ConnectToPostgres("saus", "postgres", "rainbow-coloring-books")
+	config, err := internal.LoadConfig("config.yaml")
+	if err != nil {
+		log.Fatalf("Failed to load config: %v", err)
+	}
+
+	db, err := db.ConnectToPostgres(config.DBUser, config.DBPassword, config.DBName)
 
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)

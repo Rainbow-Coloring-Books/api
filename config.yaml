@@ -1,0 +1,3 @@
+db_user: saus
+db_password: postgres
+db_name: rainbow-coloring-books
