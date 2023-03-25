@@ -12,14 +12,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
-	_ "github.com/lib/pq"
 )
-
-type User struct {
-	ID       int    `json:"id"`
-	Email    string `json:"email"`
-	Password string `json:"-"`
-}
 
 var validate *validator.Validate
 
