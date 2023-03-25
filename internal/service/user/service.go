@@ -11,7 +11,7 @@ import (
 )
 
 type UserService interface {
-	Register(email, password string) (model.User, error)
+	Register(context context.Context, email, password string) (model.User, error)
 }
 
 type userService struct {
@@ -23,9 +23,7 @@ func NewUserService(validate *validator.Validate, repo repo.UserRepository) User
 	return &userService{validate: validate, repo: repo}
 }
 
-func (s *userService) Register(email, password string) (model.User, error) {
-	ctx := context.Background()
-
+func (s *userService) Register(ctx context.Context, email, password string) (model.User, error) {
 	req := struct {
 		Email    string `validate:"required,email"`
 		Password string `validate:"required,min=8"`

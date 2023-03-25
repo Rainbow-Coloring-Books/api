@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"context"
 
 	"rainbowcoloringbooks/internal"
 	"rainbowcoloringbooks/internal/db"
@@ -12,18 +13,14 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
+
 	_ "github.com/lib/pq"
 )
-
-type User struct {
-	ID       int    `json:"id"`
-	Email    string `json:"email"`
-	Password string `json:"-"`
-}
 
 var validate *validator.Validate
 
 func main() {
+	ctx := context.Background()
 	config, err := internal.LoadConfig("config.yaml")
 	if err != nil {
 		log.Fatalf("Failed to load config: %v", err)
@@ -36,7 +33,7 @@ func main() {
 		SSLMode: "disable",
 	}
 
-	err = postgresDB.Connect()
+	err = postgresDB.Connect(ctx)
 
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
