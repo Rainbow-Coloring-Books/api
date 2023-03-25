@@ -4,8 +4,8 @@ import (
 	"database/sql"
 )
 
-func ConnectToPostgres() (*sql.DB, error) {
-	connStr := "user=saus password=postgres dbname=rainbow-coloring-books sslmode=disable"
+func ConnectToPostgres(user, password, dbname string) (*sql.DB, error) {
+	connStr := "user=" + user + " password=" + password + " dbname=" + dbname + " sslmode=disable"
 
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {

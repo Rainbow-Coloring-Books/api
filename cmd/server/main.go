@@ -23,7 +23,8 @@ type User struct {
 var validate *validator.Validate
 
 func main() {
-	db, err := db.ConnectToPostgres()
+	db, err := db.ConnectToPostgres("saus", "postgres", "rainbow-coloring-books")
+
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
