@@ -4,16 +4,14 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-
-	_ "github.com/lib/pq"
 )
 
 type Database interface {
-	Connect() error
+	Connect(ctx context.Context) error
 	Close() error
-	Exec(query string, args ...interface{}) (sql.Result, error)
-	Query(query string, args ...interface{}) (*sql.Rows, error)
-	QueryRow(query string, args ...interface{}) *sql.Row
+	Exec(ctx context.Context, query string, args ...interface{}) (sql.Result, error)
+	Query(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error)
+	QueryRow(ctx context.Context, query string, args ...interface{}) *sql.Row
 	QueryRowContext(ctx context.Context, query string, args ...interface{}) *sql.Row
 }
 
@@ -27,7 +25,7 @@ type PostgresDatabase struct {
 	SSLMode  string
 }
 
-func (p *PostgresDatabase) Connect() error {
+func (p *PostgresDatabase) Connect(ctx context.Context) error {
 	connStr := fmt.Sprintf(
 		"user=%s password=%s dbname=%s sslmode=%s",
 		p.User, p.Password, p.DBName, p.SSLMode,
@@ -47,15 +45,15 @@ func (p *PostgresDatabase) Close() error {
 	return p.DB.Close()
 }
 
-func (p *PostgresDatabase) Exec(query string, args ...interface{}) (sql.Result, error) {
+func (p *PostgresDatabase) Exec(ctx context.Context, query string, args ...interface{}) (sql.Result, error) {
 	return p.DB.Exec(query, args...)
 }
 
-func (p *PostgresDatabase) Query(query string, args ...interface{}) (*sql.Rows, error) {
+func (p *PostgresDatabase) Query(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error) {
 	return p.DB.Query(query, args...)
 }
 
-func (p *PostgresDatabase) QueryRow(query string, args ...interface{}) *sql.Row {
+func (p *PostgresDatabase) QueryRow(ctx context.Context, query string, args ...interface{}) *sql.Row {
 	return p.DB.QueryRow(query, args...)
 }
 
