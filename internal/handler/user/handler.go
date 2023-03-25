@@ -32,7 +32,7 @@ func (h *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	user, err := h.userService.Register(req.Email, req.Password)
+	user, err := h.userService.Register(r.Context(), req.Email, req.Password)
 
 	if err != nil {
 		if errors.Is(err, validator.ValidationErrors{}) {
