@@ -1,29 +1,31 @@
 package user
 
 import (
+	"context"
+
 	"github.com/go-playground/validator/v10"
 	"golang.org/x/crypto/bcrypt"
+
+	"rainbowcoloringbooks/internal/model"
+	repo "rainbowcoloringbooks/internal/repository/user"
 )
 
-type User struct {
-	ID       int
-	Email    string
-	Password string
-}
-
 type UserService interface {
-	Register(email, password string) (User, error)
+	Register(email, password string) (model.User, error)
 }
 
 type userService struct {
 	validate *validator.Validate
+	repo     repo.UserRepository
 }
 
-func NewUserService(validate *validator.Validate) UserService {
-	return &userService{validate: validate}
+func NewUserService(validate *validator.Validate, repo repo.UserRepository) UserService {
+	return &userService{validate: validate, repo: repo}
 }
 
-func (s *userService) Register(email, password string) (User, error) {
+func (s *userService) Register(email, password string) (model.User, error) {
+	ctx := context.Background()
+
 	req := struct {
 		Email    string `validate:"required,email"`
 		Password string `validate:"required,min=8"`
@@ -33,23 +35,27 @@ func (s *userService) Register(email, password string) (User, error) {
 	}
 
 	if err := s.validate.Struct(req); err != nil {
-		return User{}, err
+		return model.User{}, err
 	}
 
 	hashedPassword, err := hashPassword(password)
-	
+
 	if err != nil {
-		return User{}, err
+		return model.User{}, err
 	}
 
-	// create dummy user for now
-	user := User{
-		ID: 1,
-		Email: email,
+	user := model.User{
+		Email:    email,
 		Password: hashedPassword,
 	}
 
-	return user, nil
+	createdUser, err := s.repo.CreateUser(ctx, &user)
+
+	if err != nil {
+		return model.User{}, err
+	}
+
+	return *createdUser, nil
 }
 
 func hashPassword(password string) (string, error) {

@@ -4,27 +4,36 @@ import (
 	"log"
 	"net/http"
 
-	// TODO add actual paths
+	"rainbowcoloringbooks/internal/db"
 	userHandler "rainbowcoloringbooks/internal/handler/user"
+	userRepo "rainbowcoloringbooks/internal/repository/user"
 	userService "rainbowcoloringbooks/internal/service/user"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
+	_ "github.com/lib/pq"
 )
 
 type User struct {
 	ID       int    `json:"id"`
-	Email    string    `json:"email"`
+	Email    string `json:"email"`
 	Password string `json:"-"`
 }
 
 var validate *validator.Validate
 
 func main() {
-	validate = validator.New()
-	userService := userService.NewUserService(validate)
-	userHandler := userHandler.NewUserHandler(userService)
+	db, err := db.ConnectToPostgres()
+	if err != nil {
+		log.Fatalf("Failed to connect to database: %v", err)
+	}
 
+	defer db.Close()
+
+	validate = validator.New()
+	userRepo := userRepo.NewPostgresUserRepository(db)
+	userService := userService.NewUserService(validate, userRepo)
+	userHandler := userHandler.NewUserHandler(userService)
 
 	r := mux.NewRouter()
 	userHandler.RegisterRoutes(r)
