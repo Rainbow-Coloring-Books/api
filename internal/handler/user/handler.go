@@ -30,6 +30,7 @@ func (h *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid input, please provide valid email and password", http.StatusBadRequest)
 		return
 	}
+	defer r.Body.Close()
 
 	user, err := h.userService.Register(req.Email, req.Password)
 
@@ -42,13 +43,17 @@ func (h *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// return a success message and user ID
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"message": "User Created Successfully",
 		"user_id": user.ID,
 	})
+
+	if err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		return
+	}
 }
 
 func (h *UserHandler) RegisterRoutes(r *mux.Router) {
