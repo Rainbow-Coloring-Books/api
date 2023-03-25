@@ -3,7 +3,6 @@ package user
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
@@ -38,7 +37,6 @@ func (h *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 		if errors.Is(err, validator.ValidationErrors{}) {
 			http.Error(w, "Invalid input, please provide valid email and password", http.StatusBadRequest)
 		} else {
-			fmt.Println(err)
 			http.Error(w, "Failed to register user", http.StatusInternalServerError)
 		}
 		return
