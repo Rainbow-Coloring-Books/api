@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 
+	"rainbowcoloringbooks/internal/db"
 	"rainbowcoloringbooks/internal/model/user"
 )
 
@@ -13,10 +14,10 @@ type UserRepository interface {
 }
 
 type postgresUserRepository struct {
-	db *sql.DB
+	db db.Database
 }
 
-func NewPostgresUserRepository(db *sql.DB) UserRepository {
+func NewPostgresUserRepository(db db.Database) UserRepository {
 	return &postgresUserRepository{db: db}
 }
 

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -30,16 +29,23 @@ func main() {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
-	db, err := db.ConnectToPostgres(config.DBUser, config.DBPassword, config.DBName)
+	postgresDB := &db.PostgresDatabase{
+		User:     config.DBUser,
+		Password: config.DBPassword,
+		DBName:   config.DBName,
+		SSLMode: "disable",
+	}
+
+	err = postgresDB.Connect()
 
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
-	defer db.Close()
+	defer postgresDB.Close()
 
 	validate = validator.New()
-	userRepo := userRepo.NewPostgresUserRepository(db)
+	userRepo := userRepo.NewPostgresUserRepository(postgresDB)
 	userService := userService.NewUserService(validate, userRepo)
 	userHandler := userHandler.NewUserHandler(userService)
 
