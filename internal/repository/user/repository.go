@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"rainbowcoloringbooks/internal/model"
+	"rainbowcoloringbooks/internal/model/user"
 )
 
 type UserRepository interface {

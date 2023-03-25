@@ -6,7 +6,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"golang.org/x/crypto/bcrypt"
 
-	"rainbowcoloringbooks/internal/model"
+	"rainbowcoloringbooks/internal/model/user"
 	repo "rainbowcoloringbooks/internal/repository/user"
 )
 
