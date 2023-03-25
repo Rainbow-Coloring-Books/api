@@ -14,6 +14,9 @@ func LoadConfig(filename string) (Config, error) {
 	viper.SetConfigType("yaml")
 	viper.SetConfigFile(filename)
 
+	viper.SetEnvPrefix("RCB")
+	viper.AutomaticEnv()
+
 	err := viper.ReadInConfig()
 
 	if err != nil {
