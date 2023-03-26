@@ -1,3 +1,5 @@
+//go:generate mockgen -destination=mocks.go -package=user rainbowcoloringbooks/internal/handler/user UserHandler
+
 package user
 
 import (
@@ -11,15 +13,20 @@ import (
 	userService "rainbowcoloringbooks/internal/service/user"
 )
 
-type UserHandler struct {
+type UserHandler interface {
+	Register(w http.ResponseWriter, r *http.Request)
+	RegisterRoutes(r *mux.Router)
+}
+
+type userHandler struct {
 	userService userService.UserService
 }
 
-func NewUserHandler(userService userService.UserService) *UserHandler {
-	return &UserHandler{userService: userService}
+func NewUserHandler(userService userService.UserService) *userHandler {
+	return &userHandler{userService: userService}
 }
 
-func (h *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
+func (h *userHandler) Register(w http.ResponseWriter, r *http.Request) {
 	var req struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
@@ -35,7 +42,7 @@ func (h *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 	user, err := h.userService.Register(r.Context(), req.Email, req.Password)
 
 	if err != nil {
-		if errors.Is(err, validator.ValidationErrors{}) {
+		if errors.As(err, &validator.ValidationErrors{}) {
 			http.Error(w, "Invalid input, please provide valid email and password", http.StatusBadRequest)
 		} else {
 			http.Error(w, "Failed to register user", http.StatusInternalServerError)
@@ -56,6 +63,6 @@ func (h *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *UserHandler) RegisterRoutes(r *mux.Router) {
+func (h *userHandler) RegisterRoutes(r *mux.Router) {
 	r.HandleFunc("/register", h.Register).Methods(http.MethodPost)
 }

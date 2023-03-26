@@ -1,4 +1,4 @@
-//go:generate mockgen -destination=mocks.go -package=user rainbowcoloringbooks/internal/service/user UserService
+//go:generate mockgen -destination=mocks.go -package=user rainbowcoloringbooks/internal/handler/user UserService
 
 package user
 
