@@ -1,3 +1,5 @@
+//go:generate mockgen -destination=mocks.go -package=db rainbowcoloringbooks/internal/db Database
+
 package db
 
 import (

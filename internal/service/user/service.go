@@ -1,3 +1,5 @@
+//go:generate mockgen -destination=mocks.go -package=user rainbowcoloringbooks/internal/service/user UserService
+
 package user
 
 import (
