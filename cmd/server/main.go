@@ -11,13 +11,10 @@ import (
 	userRepo "rainbowcoloringbooks/internal/repository/user"
 	userService "rainbowcoloringbooks/internal/service/user"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 
 	_ "github.com/lib/pq"
 )
-
-var validate *validator.Validate
 
 func main() {
 	ctx := context.Background()
@@ -41,9 +38,8 @@ func main() {
 
 	defer postgresDB.Close()
 
-	validate = validator.New()
 	userRepo := userRepo.NewPostgresUserRepository(postgresDB.DB)
-	userService := userService.NewUserService(validate, userRepo)
+	userService := userService.NewUserService(userRepo)
 	userHandler := userHandler.NewUserHandler(userService)
 
 	r := mux.NewRouter()

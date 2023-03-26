@@ -1,4 +1,4 @@
-//go:generate mockgen -destination=mocks.go -package=user rainbowcoloringbooks/internal/handler/user UserService
+//go:generate mockgen -destination=mocks.go -package=user rainbowcoloringbooks/internal/service/user UserService
 
 package user
 
@@ -21,8 +21,11 @@ type userService struct {
 	repo     repo.UserRepository
 }
 
-func NewUserService(validate *validator.Validate, repo repo.UserRepository) UserService {
-	return &userService{validate: validate, repo: repo}
+func NewUserService(repo repo.UserRepository) UserService {
+	return &userService{
+		validate: validator.New(),
+		repo: repo,
+	}
 }
 
 func (s *userService) Register(ctx context.Context, email, password string) (model.User, error) {
@@ -58,6 +61,7 @@ func (s *userService) Register(ctx context.Context, email, password string) (mod
 	return *createdUser, nil
 }
 
+// TODO: Move this to a separate package
 func hashPassword(password string) (string, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
