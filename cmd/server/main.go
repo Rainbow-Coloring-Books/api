@@ -1,9 +1,9 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
-	"context"
 
 	"rainbowcoloringbooks/internal"
 	"rainbowcoloringbooks/internal/db"
@@ -30,7 +30,7 @@ func main() {
 		User:     config.DBUser,
 		Password: config.DBPassword,
 		DBName:   config.DBName,
-		SSLMode: "disable",
+		SSLMode:  "disable",
 	}
 
 	err = postgresDB.Connect(ctx)
@@ -42,7 +42,7 @@ func main() {
 	defer postgresDB.Close()
 
 	validate = validator.New()
-	userRepo := userRepo.NewPostgresUserRepository(postgresDB)
+	userRepo := userRepo.NewPostgresUserRepository(postgresDB.DB)
 	userService := userService.NewUserService(validate, userRepo)
 	userHandler := userHandler.NewUserHandler(userService)
 
