@@ -3,36 +3,33 @@ package db_test
 import (
 	"context"
 	"testing"
+	"errors"
 
+	"github.com/golang/mock/gomock"
 	"rainbowcoloringbooks/internal/db"
-	_ "github.com/lib/pq"
 )
-
-// TODO - these tests actually connect to the database. We should mock the database connection.
 
 func TestConnect(t *testing.T) {
 	testCases := []struct {
 		name    string
-		config  db.PostgresDatabase
+		setup   func(*gomock.Controller) db.Database
 		wantErr bool
 	}{
 		{
 			name: "valid connection",
-			config: db.PostgresDatabase{
-				User:     "saus",
-				Password: "postgres",
-				DBName:   "rainbow-coloring-books",
-				SSLMode:  "disable",
+			setup: func(ctrl *gomock.Controller) db.Database {
+				mockDB := db.NewMockDatabase(ctrl)
+				mockDB.EXPECT().Connect(gomock.Any()).Return(nil)
+				return mockDB
 			},
 			wantErr: false,
 		},
 		{
 			name: "invalid credentials",
-			config: db.PostgresDatabase{
-				User:     "invalid_user",
-				Password: "invalid_password",
-				DBName:   "invalid_db_name",
-				SSLMode:  "disable",
+			setup: func(ctrl *gomock.Controller) db.Database {
+				mockDB := db.NewMockDatabase(ctrl)
+				mockDB.EXPECT().Connect(gomock.Any()).Return(errors.New("invalid credentials"))
+				return mockDB
 			},
 			wantErr: true,
 		},
@@ -40,8 +37,13 @@ func TestConnect(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			mockDB := tc.setup(ctrl)
 			ctx := context.Background()
-			err := tc.config.Connect(ctx)
+			err := mockDB.Connect(ctx)
+
 			if tc.wantErr {
 				if err == nil {
 					t.Errorf("expected an error but got nil")
@@ -50,9 +52,6 @@ func TestConnect(t *testing.T) {
 				if err != nil {
 					t.Errorf("unexpected error: %v", err)
 				}
-			}
-			if err == nil {
-				_ = tc.config.Close()
 			}
 		})
 	}
