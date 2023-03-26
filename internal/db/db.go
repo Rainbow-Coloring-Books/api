@@ -38,6 +38,10 @@ func (p *PostgresDatabase) Connect(ctx context.Context) error {
 		return err
 	}
 
+	if err := db.PingContext(ctx); err != nil {
+        return err
+    }
+
 	p.DB = db
 
 	return nil
