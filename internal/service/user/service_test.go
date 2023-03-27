@@ -5,7 +5,6 @@ import (
 	"testing"
 	"errors"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
@@ -66,8 +65,7 @@ func TestRegister(t *testing.T) {
 
 			mockUserRepository := repo.NewMockUserRepository(ctrl)
 
-			validate := validator.New()
-			service := user.NewUserService(validate, mockUserRepository)
+			service := user.NewUserService(mockUserRepository)
 
 			if !tc.expectErr {
 				mockUserRepository.EXPECT().CreateUser(gomock.Any(), gomock.Any()).Return(&model.User{Email: tc.email, Password: "hashed_password"}, nil)

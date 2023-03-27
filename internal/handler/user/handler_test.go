@@ -24,6 +24,7 @@ func TestRegister(t *testing.T) {
 		name               string
 		password           string
 		serviceError       error
+		serviceUser        model.User
 		expectedStatusCode int
 	}{
 		{
@@ -31,6 +32,7 @@ func TestRegister(t *testing.T) {
 			email:              "test@example.com",
 			password:           "TestPass123!",
 			serviceError:       nil,
+			serviceUser:        model.User{ID: 1, Email: "test@example.com", Password: "TestPass123!"},
 			expectedStatusCode: http.StatusCreated,
 		},
 		{
@@ -38,6 +40,7 @@ func TestRegister(t *testing.T) {
 			email:              "invalid_email",
 			password:           "short",
 			serviceError:       validator.ValidationErrors{},
+			serviceUser:        model.User{},
 			expectedStatusCode: http.StatusBadRequest,
 		},
 		{
@@ -45,6 +48,7 @@ func TestRegister(t *testing.T) {
 			email:              "test@example.com",
 			password:           "TestPass123!",
 			serviceError:       errors.New("registration error"),
+			serviceUser:        model.User{},
 			expectedStatusCode: http.StatusInternalServerError,
 		},
 	}
@@ -59,7 +63,7 @@ func TestRegister(t *testing.T) {
 
 			mockUserService.EXPECT().
 				Register(gomock.Any(), tc.email, tc.password).
-				Return(model.User{ID: 1, Email: tc.email, Password: tc.password}, tc.serviceError)
+				Return(tc.serviceUser, tc.serviceError)
 
 			r := mux.NewRouter()
 			handler.RegisterRoutes(r)
