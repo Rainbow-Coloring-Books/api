@@ -4,6 +4,7 @@ package user
 
 import (
 	"context"
+	"errors"
 
 	"github.com/go-playground/validator/v10"
 	"golang.org/x/crypto/bcrypt"
@@ -21,6 +22,8 @@ type userService struct {
 	repo     repo.UserRepository
 }
 
+var ErrEmailAlreadyInUse = errors.New("email already in use")
+
 func NewUserService(repo repo.UserRepository) UserService {
 	return &userService{
 		validate: validator.New(),
@@ -29,6 +32,11 @@ func NewUserService(repo repo.UserRepository) UserService {
 }
 
 func (s *userService) Register(ctx context.Context, email, password string) (model.User, error) {
+	existingUser, _ := s.repo.FindUserByEmail(ctx, email)
+	if existingUser != nil {
+		return model.User{}, ErrEmailAlreadyInUse
+	}
+
 	req := struct {
 		Email    string `validate:"required,email"`
 		Password string `validate:"required,min=8"`

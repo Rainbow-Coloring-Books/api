@@ -44,6 +44,9 @@ func (h *userHandler) Register(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.As(err, &validator.ValidationErrors{}) {
 			http.Error(w, "Invalid input, please provide valid email and password", http.StatusBadRequest)
+		} else if errors.Is(err, userService.ErrEmailAlreadyInUse) {
+			http.Error(w, "Email already in use", http.StatusConflict)
+			return
 		} else {
 			http.Error(w, "Failed to register user", http.StatusInternalServerError)
 		}
