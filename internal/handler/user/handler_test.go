@@ -15,7 +15,7 @@ import (
 
 	userHandler "rainbowcoloringbooks/internal/handler/user"
 	model "rainbowcoloringbooks/internal/model/user"
-	userServiceMock "rainbowcoloringbooks/internal/service/user"
+	service "rainbowcoloringbooks/internal/service/user"
 )
 
 func TestRegister(t *testing.T) {
@@ -51,6 +51,22 @@ func TestRegister(t *testing.T) {
 			serviceUser:        model.User{},
 			expectedStatusCode: http.StatusInternalServerError,
 		},
+		{
+            name:               "email_already_in_use",
+            email:              "existing@example.com",
+            password:           "P@ssw0rd123",
+			serviceError:       service.ErrEmailAlreadyInUse,
+			serviceUser:        model.User{},
+            expectedStatusCode: http.StatusConflict,
+        },
+        {
+            name:               "internal_server_error",
+            email:              "error@example.com",
+            password:           "P@ssw0rd123",
+			serviceError:       errors.New("Internal server error"),
+			serviceUser:        model.User{},
+            expectedStatusCode: http.StatusInternalServerError,
+        },
 	}
 
 	for _, tc := range testCases {
@@ -58,7 +74,7 @@ func TestRegister(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			mockUserService := userServiceMock.NewMockUserService(ctrl)
+			mockUserService := service.NewMockUserService(ctrl)
 			handler := userHandler.NewUserHandler(mockUserService)
 
 			mockUserService.EXPECT().
