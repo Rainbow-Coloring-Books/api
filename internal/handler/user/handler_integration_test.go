@@ -24,7 +24,6 @@ var (
     userService service.UserService
 )
 
-// TODO - create a new test database for integration tests and clear it after the tests are done
 func setupTables(db *sql.DB) error {
 	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS users (
 		id SERIAL PRIMARY KEY,
