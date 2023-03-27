@@ -29,7 +29,7 @@ paths:
                   example: 12.99
                 currency:
                   type: string
-                  description: The currency of the payment (default: USD)
+                  description: "The currency of the payment (default: USD)"
                   example: "usd"
                   default: 'usd'
               required:

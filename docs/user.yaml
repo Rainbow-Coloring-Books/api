@@ -1,11 +1,7 @@
 openapi: 3.0.0
 info:
-  title: Custom Coloring Book API - User
-  version: 1.1.0
-
-servers:
-  - url: https://www.googleapis.com
-
+  title: User API
+  version: 1.0.0
 paths:
   /register:
     post:
@@ -20,20 +16,17 @@ paths:
                 email:
                   type: string
                   format: email
-                  description: The user's email address
+                  example: user@example.com
                 password:
                   type: string
                   minLength: 8
-                  description: The user's password
+                  example: P@ssw0rd
               required:
                 - email
                 - password
-            example:
-              email: john.doe@example.com
-              password: veryStrongPassword123
       responses:
-        '201':
-          description: User created successfully
+        201:
+          description: User registered successfully
           content:
             application/json:
               schema:
@@ -41,29 +34,40 @@ paths:
                 properties:
                   message:
                     type: string
-                    description: A success message
-                  user_id:
-                    type: integer
-                    description: The ID of the newly created user
-                example:
-                  message: User created successfully
-                  user_id: 123
-        '400':
-          description: Invalid input
+                    example: User registered successfully
+        400:
+          description: Bad request
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  message:
+                  error:
                     type: string
-                    description: An error message
-                example:
-                  message: Invalid input, please provide valid email and password
-
+                    example: Invalid email or password format
+        409:
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Email already exists
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: An unexpected error occurred
   /login:
     post:
-      summary: Log in a user
+      summary: Authenticate a user
       requestBody:
         required: true
         content:
@@ -74,87 +78,17 @@ paths:
                 email:
                   type: string
                   format: email
-                  description: The user's email address
+                  example: user@example.com
                 password:
                   type: string
                   minLength: 8
-                  description: The user's password
+                  example: P@ssw0rd
               required:
                 - email
                 - password
-            example:
-              email: john.doe@example.com
-              password: veryStrongPassword123
       responses:
-        '200':
-          description: User logged in successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  token:
-                    type: string
-                    description: An authentication token for the user
-                  user_id:
-                    type: integer
-                    description: The ID of the logged in user
-                example:
-                  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-                  user_id: 123
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    description: An error message
-                example:
-                  message: Unauthorized, please provide valid credentials
-
-  /oauth2/v4/token:
-    post:
-      summary: Get an access token from a Google Sign-In authorization code
-      requestBody:
-        required: true
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              type: object
-              properties:
-                code:
-                  type: string
-                  description: The authorization code obtained from the Google Sign-In flow
-                client_id:
-                  type: string
-                  description: The client ID of your Google Cloud Console project
-                client_secret:
-                  type: string
-                  description: The client secret of your Google Cloud Console project
-                redirect_uri:
-                  type: string
-                  description: The redirect URI registered for your Google Cloud Console project
-                grant_type:
-                  type: string
-                  description: The OAuth 2.0 grant type. Must be set to authorization_code for the Google Sign-In flow.
-              required:
-                - code
-                - client_id
-                - client_secret
-                - redirect_uri
-                - grant_type
-            example:
-              code: 4/v6xr77ewYqjksZLdUHi...
-              client_id: your_client_id.apps.googleusercontent.com
-              client_secret: your_client_secret
-              redirect_uri: https://yourapp.com/oauth2callback
-              grant_type: authorization_code
-      responses:
-        '200':
-          description: Access token obtained successfully
+        200:
+          description: User authenticated successfully
           content:
             application/json:
               schema:
@@ -162,27 +96,9 @@ paths:
                 properties:
                   access_token:
                     type: string
-                    description: The access token that can be used to make authorized API calls
-                  expires_in:
-                    type: integer
-                    description: The duration of the access token in seconds
-                  token_type:
-                    type: string
-                    description: The type of the access token, usually "Bearer"
-                  refresh_token:
-                    type: string
-                    description: A refresh token that can be used to obtain a new access token when the current one expires
-                  scope:
-                    type: string
-                    description: The scopes of access granted by the access token
-                example:
-                  access_token: ya29.a0Adw1xeWYf33JS...
-                  expires_in: 3600
-                  token_type: Bearer
-                  refresh_token: 1//0c6UYPw6gJLE4CgYIARAAGA...
-                  scope: https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email
-        '400':
-          description: Invalid input or error during token exchange
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        400:
+          description: Bad request
           content:
             application/json:
               schema:
@@ -190,10 +106,134 @@ paths:
                 properties:
                   error:
                     type: string
-                    description: The error code
-                  error_description:
+                    example: Invalid email or password format
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
                     type: string
-                    description: A human-readable description of the error
-                example:
-                  error: invalid_grant
-                  error_description: Invalid authorization code
+                    example: Invalid email or password
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: An unexpected error occurred
+  /profile:
+    get:
+      summary: Retrieve the user's profile
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: User's profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+                    example: 1
+                  email:
+                    type: string
+                    format: email
+                    example: user@example.com
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Unauthorized access
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: An unexpected error occurred
+  /profile/password:
+    put:
+      summary: Update the user's password
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                old_password:
+                  type: string
+                  minLength: 8
+                  example: P@ssw0rd
+                new_password:
+                  type: string
+                  minLength: 8
+                  example: N3wP@ssw0rd
+              required:
+                - old_password
+                - new_password
+      responses:
+        200:
+          description: Password updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Password updated successfully
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Invalid password format
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Unauthorized access or incorrect old password
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: An unexpected error occurred
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
